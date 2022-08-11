@@ -7,14 +7,20 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue')
-  }
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/Home.vue'),
+  },
+  // {
+  //   path: '/loginFirst',
+  //   name: 'loginFirst',
+  //   component: () => import('../views/LoginFirst.vue'),
+  // },
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
 })
 
 export default router

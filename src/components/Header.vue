@@ -1,7 +1,10 @@
 <template>
-  <div class="loginContainer">
-    <div class="titleStyle"><h1>Urban Renewal</h1></div>
-    <div class="loginButtonList">
+  <div id="loginContainer">
+    <div id="titleStyle"><h1>Urban Renewal</h1></div>
+    <div id="loginImg" v-if="loggedInStatus">
+      <img :src="imgURL" />
+    </div>
+    <div id="notLoginButtonList" v-else>
       <div class="loginButton">
         <div
           id="g_id_onload"
@@ -37,29 +40,75 @@ import jwtDecode from 'jwt-decode'
 export default {
   created() {
     window.handleCredentialResponse = function (response) {
-      console.log(response)
       const result = jwtDecode(response.credential)
-      console.log(result)
-      console.log('Encoded JWT ID token: ' + response.credential)
-      window.sessionStorage.setItem('googleLogin', response.credential)
+      // console.log(result)
+      // console.log('Encoded JWT ID token: ' + response.credential)
+      window.sessionStorage.setItem('googleLoggedInToken', response.credential)
+      window.sessionStorage.setItem('googleUserImg', result.picture)
+      window.location.reload(true)
     }
+  },
+  data() {
+    return {
+      imgURL: '',
+    }
+  },
+  computed: {
+    /**
+     * @description 登入了嗎？如果登入了，那就顯示圖像吧。如果沒登入那就顯示登入按鈕
+     */
+    loggedInStatus() {
+      if (
+        window.sessionStorage.getItem('googleLoggedInToken') ||
+        window.sessionStorage.getItem('fbssls_744433083484271')
+      ) {
+        this.$emit('loginStatus', true)
+        return true
+      } else {
+        this.$emit('loginStatus', false)
+        return false
+      }
+    },
+  },
+  mounted() {
+    this.loggedInProfile()
+  },
+  methods: {
+    loggedInProfile() {
+      if (window.sessionStorage.getItem('googleLoggedInToken')) {
+        const result = jwtDecode(
+          window.sessionStorage.getItem('googleLoggedInToken')
+        )
+        this.imgURL = result.picture
+      } else if (window.sessionStorage.getItem('fbUserImg')) {
+        this.imgURL = window.sessionStorage.getItem('fbUserImg')
+      }
+    },
   },
 }
 </script>
 
 <style scoped lang="scss">
-.loginContainer {
+#loginContainer {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 100vw;
-  .titleStyle {
+  #titleStyle {
     color: blue;
     margin-left: 6px;
   }
-  .loginButtonList {
+  #loginImg {
+    margin: auto 8px;
+    img {
+      border-radius: 50%;
+      width: 60px;
+      box-shadow: 5px 5px 7px rgba(0, 0, 0, 0.7);
+    }
+  }
+  #notLoginButtonList {
     margin-right: 6px;
     .loginButton {
       margin: 6px 0;
@@ -67,10 +116,19 @@ export default {
   }
 }
 
-@media (max-width:620px){
-    .loginContainer{
-        flex-direction: column;
+@media (max-width: 620px) {
+  #loginContainer {
+    #notLoginButtonList {
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      margin-top: 2px;
+      z-index: 100;
+      .loginButton {
+        margin: 6px 0;
+      }
     }
+  }
 }
 </style>
 

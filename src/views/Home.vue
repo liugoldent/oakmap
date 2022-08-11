@@ -1,26 +1,66 @@
 <template>
   <div id="homeContanier">
-    <MapCompVue
-      :casePlace="place"
-      :detailList="allDetailList"
-      v-if="place.length > 0"
-      @clickPositionS="clickPositionF"
-    />
-    <li v-for="data in allDetailList" :key="data.id">
-      {{ data.stop_name }} {{ data.distance }}
-    </li>
+    <div id="map">
+      <MapCompVue
+        ref="mapSelf"
+        v-if="place.length > 0"
+        :casePlace="place"
+        :detailList="allDetailList"
+        @clickPositionS="clickPositionF"
+      />
+    </div>
+    <div id="searchGeo">
+      <GeoSearchBtnVue @userClick="userClick" />
+    </div>
+    <div id="buttonOrder" v-if="Object.keys(distanceDataOnView).length > 0">
+      <button @click="orderBy('toClose')">由近至遠</button>
+      <button @click="orderBy('toFar')">由遠至近</button>
+    </div>
+    <div id="list">
+      <List :distanceDataOnView="distanceDataOnView" />
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 import MapCompVue from '@/components/MapComp.vue'
+import GeoSearchBtnVue from '../components/GeoSearchBtn.vue'
+import List from '@/components/List.vue'
 import axios from 'axios'
 
 export default {
   name: 'Home',
   components: {
     MapCompVue,
+    List,
+    GeoSearchBtnVue,
+  },
+  computed: {
+    /**
+     * @description 將各位置的最小距離取出，顯示在畫面上
+     */
+    distanceDataOnView() {
+      let rawResult = {}
+      let sortable = []
+      for (let i = 0, len = this.allDetailList.length; i < len; i++) {
+        const { stop_name, distance } = this.allDetailList[i]
+        if (!rawResult[`${stop_name}`]) {
+          rawResult[`${stop_name}`] = distance
+        } else {
+          rawResult[`${stop_name}`] =
+            distance > rawResult[`${stop_name}`]
+              ? rawResult[`${stop_name}`]
+              : distance
+        }
+      }
+      for (let distanceData in rawResult) {
+        sortable.push([distanceData, rawResult[distanceData]])
+      }
+      this.orderByStatus > 0
+        ? sortable.sort((a, b) => a[1] - b[1])
+        : sortable.sort((a, b) => b[1] - a[1])
+      return sortable
+    },
   },
   data() {
     return {
@@ -28,6 +68,8 @@ export default {
       allPlace: [], // 打api取得的所有土城都更資料
       place: [], // 傳給map的polygon資料
       allDetailList: [], // 打api取得的所有list資料
+      orderByStatus: -1, // 正序 or 反序
+      searchResult: [], // 使用者輸入然後搜尋出來的結果
     }
   },
   async mounted() {
@@ -35,6 +77,13 @@ export default {
     this.place = this.devideEachPlace(this.allPlace)
   },
   methods: {
+    /**
+     * @description 顯示list怎麼去排序
+     * @param {*} status
+     */
+    orderBy(status) {
+      this.orderByStatus = status === 'toFar' ? -1 : 1
+    },
     /**
      * @description 取得所有地點的API
      */
@@ -77,7 +126,6 @@ export default {
           }
         )
         .then((response) => {
-          console.log('getDetail 成功', response)
           return response.data.result
         })
         .catch((e) => console.log('getDetail 失敗', e))
@@ -86,12 +134,12 @@ export default {
      * @description 用點到的位置去打api，看距離多少
      * @param {*} e
      */
-    async clickPositionF(e) {
-      const { lat, lng } = e.latlng
+    async clickPositionF(latlngObj) {
+      const { lat, lng } = latlngObj
       this.allDetailList = await this.getDetail(lat, lng)
     },
     /**
-     * @description 把容積變成陣列
+     * @description 把容積變成要給map的陣列
      * @param {Array} allPlace
      */
     devideEachPlace(allPlace) {
@@ -102,9 +150,53 @@ export default {
         return accumulator
       }, [])
     },
+    /**
+     * @description 得到點選結果 -> 要送給map組件
+     * @param {Array} searchResult
+     */
+    async userClick(e) {
+      const { x: lng, y: lat } = e
+      this.$refs.mapSelf.changePan({lng, lat})
+      this.allDetailList = await this.getDetail(lat, lng)
+    },
   },
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+%margin-style {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+#homeContanier {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  #buttonOrder {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    width: 90vw;
+    button {
+      border: 2px solid #7a1b41;
+      border-radius: 30px;
+      box-shadow: #7a1b41 4px 4px 0 0;
+      margin-right: 10px;
+      &:hover{
+        cursor: pointer;
+      }
+    }
+  }
+  #searchGeo {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    width: 90vw;
+    position: relative;
+  }
+  #list {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    @extend %margin-style;
+  }
+}
 </style>

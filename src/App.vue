@@ -1,22 +1,36 @@
 <template>
   <div id="app">
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
-    <Header />
-    <router-view />
+    <Header @loginStatus="loginStatusF" />
+    <router-view v-if="loginValue" />
+    <Error v-else />
   </div>
 </template>
 <script>
 import Header from './components/Header.vue'
+import Error from './views/Error.vue'
+
 export default {
   name: 'App',
   components: {
     Header,
+    Error,
+  },
+  data() {
+    return {
+      loginValue: false,
+    }
   },
   mounted: {},
-  methods: {},
+  methods: {
+    /**
+     * @description 若登入則為true，若沒登入為false
+     * @param {*} status
+     */
+    loginStatusF(status) {
+      console.log(status)
+      this.loginValue = status
+    },
+  },
 }
 </script>
 <style lang="scss">

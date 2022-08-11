@@ -15,7 +15,8 @@ export default {
     return {
       openStreetMap: {},
       nowMark: {},
-      circleStatus: {}
+      circleStatus: {},
+      imgURL: '',
     }
   },
   props: {
@@ -38,6 +39,7 @@ export default {
     this.openStreetMap.on('locationfound', this.foundHandler)
     this.openStreetMap.on('click', this.getNewLatLng)
     this.polygonIt()
+    this.initUserImg()
   },
   methods: {
     /**
@@ -45,21 +47,21 @@ export default {
      */
     getNewLatLng(e) {
       if (e.latlng.lat && e.latlng.lng) {
-        this.marketIt(e)
-        this.mapPanTo(e)
-        this.$emit('clickPositionS', e)
+        const { lat, lng } = e.latlng
+        this.marketIt({ lat, lng })
+        this.mapPanTo({ lat, lng })
+        this.$emit('clickPositionS', { lat, lng })
       }
     },
     /**
      * @description 要放上大頭針的地方
      * @param {*} e 座標位址
      */
-    marketIt(e) {
+    marketIt({ lat, lng }) {
       if (this.nowMark) this.openStreetMap.removeLayer(this.nowMark)
-      this.nowMark = L.marker([e.latlng.lat, e.latlng.lng]).addTo(
-        this.openStreetMap
-      )
-      console.log(this.nowMark)
+      // const url = window.sessionStorage.getItem('fbUserImg')
+      this.nowMark = L.marker([lat, lng]).addTo(this.openStreetMap)
+      this.nowMark.bindPopup(`<img src=${this.imgURL} width = "48" height = "48"/>`).openPopup()
     },
     /**
      * @description 先上多邊形圖
@@ -67,7 +69,7 @@ export default {
     polygonIt() {
       try {
         const polygon = L.polygon(this.casePlace, {
-          color: '#00BFFF',
+          color: '#308AFB',
           fillOpacity: 0.3,
           opacity: 0.5,
         }).addTo(this.openStreetMap)
@@ -103,8 +105,9 @@ export default {
      */
     foundHandler(e) {
       try {
-        this.marketIt(e)
-        this.mapPanTo(e)
+        const { lat, lng } = e.latlng
+        this.marketIt({ lat, lng })
+        this.mapPanTo({ lat, lng })
       } catch (e) {
         console.error(e.message)
       }
@@ -113,8 +116,8 @@ export default {
      * @description 將地圖移動到目標位置
      * @param {*} e
      */
-    mapPanTo(e) {
-      this.openStreetMap.panTo([e.latlng.lat, e.latlng.lng])
+    mapPanTo({ lat, lng }) {
+      this.openStreetMap.panTo([lat, lng])
     },
     /**
      * @description 取得使用者位置
@@ -126,19 +129,46 @@ export default {
      * @description 將都更範圍圈起來
      */
     circleIt(allDetailList) {
-      if(Object.keys(this.circleStatus).length > 0) return
+      if (Object.keys(this.circleStatus).length > 0) return
       for (let i = 0, len = allDetailList.length; i < len; i++) {
-        const { latitude, longitude, radius} = allDetailList[i]
-        // if (distance < 1) {
-          this.circleStatus = L.circle(
-            { lat: latitude, lng: longitude },
-            {
-              radius,
-              color: 'red',
-              opacity: 0.2,
-            }
-          ).addTo(this.openStreetMap)
-        // }
+        const { latitude, longitude, radius, id } = allDetailList[i]
+        this.circleStatus = L.circle(
+          { lat: latitude, lng: longitude },
+          {
+            radius,
+            color: 'red',
+            opacity: 0.2,
+            name: id,
+          }
+        )
+          .addTo(this.openStreetMap)
+          .on('click', this.circleInfor)
+      }
+    },
+    /**
+     * @description 點圓圈取得資訊
+     * @param {*} e
+     */
+    circleInfor(e) {
+      console.log(e.sourceTarget.options)
+      // const id = e.sourceTarget.options.name
+      // const result = this.detailList.find((data) => data.id === id)
+    },
+    /**
+     * @description 從父組件打下來資料
+     */
+    changePan({ lat, lng }) {
+      this.marketIt({ lat, lng })
+      this.mapPanTo({ lat, lng })
+    },
+    /**
+     * @description 初始化使用者的大頭貼url
+     */
+    initUserImg() {
+      if (window.sessionStorage.getItem('fbUserImg')) {
+        this.imgURL = window.sessionStorage.getItem('fbUserImg')
+      } else if (window.sessionStorage.getItem('googleUserImg')) {
+        this.imgURL = window.sessionStorage.getItem('googleUserImg')
       }
     },
   },
@@ -162,8 +192,8 @@ export default {
   #buttonContainer {
     position: absolute;
     margin-top: 4px;
-    bottom: 0px;
-    left: 0px;
+    bottom: 23px;
+    right: 0px;
     z-index: 100;
     .buttonStyle {
       margin-right: 8px;
@@ -179,6 +209,12 @@ export default {
       box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px,
         4px 4px 0px 0px, 5px 5px 0px 0px;
     }
+  }
+}
+
+@media (max-width: 620px) {
+  #mapid {
+    height: 50vh !important;
   }
 }
 </style>
