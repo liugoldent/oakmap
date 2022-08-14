@@ -96,11 +96,9 @@ export default {
         .post(this.apiURL, bodyData, {
           headers: {
             'content-type': 'application/json',
-            // 'Authorization': `Bearer ${this.token}`
           },
         })
         .then((response) => {
-          console.log('getPlace 成功')
           return response.data.result.features
         })
         .catch((e) => alert(e))
@@ -121,7 +119,6 @@ export default {
           {
             headers: {
               'content-type': 'application/json',
-              // 'Authorization': `Bearer ${this.token}`
             },
           }
         )

@@ -35,23 +35,21 @@
 </template>
 
 <script>
-import jwtDecode from 'jwt-decode'
+import jwtDecode from "jwt-decode";
 
 export default {
   created() {
     window.handleCredentialResponse = function (response) {
-      const result = jwtDecode(response.credential)
-      // console.log(result)
-      // console.log('Encoded JWT ID token: ' + response.credential)
-      window.sessionStorage.setItem('googleLoggedInToken', response.credential)
-      window.sessionStorage.setItem('googleUserImg', result.picture)
-      window.location.reload(true)
-    }
+      const result = jwtDecode(response.credential);
+      window.sessionStorage.setItem("googleLoggedInToken", response.credential);
+      window.sessionStorage.setItem("googleUserImg", result.picture);
+      window.location.reload(true);
+    };
   },
   data() {
     return {
-      imgURL: '',
-    }
+      imgURL: "",
+    };
   },
   computed: {
     /**
@@ -59,33 +57,33 @@ export default {
      */
     loggedInStatus() {
       if (
-        window.sessionStorage.getItem('googleLoggedInToken') ||
-        window.sessionStorage.getItem('fbssls_744433083484271')
+        window.sessionStorage.getItem("googleLoggedInToken") ||
+        window.sessionStorage.getItem("fbssls_744433083484271")
       ) {
-        this.$emit('loginStatus', true)
-        return true
+        this.$emit("loginStatus", true);
+        return true;
       } else {
-        this.$emit('loginStatus', false)
-        return false
+        this.$emit("loginStatus", false);
+        return false;
       }
     },
   },
   mounted() {
-    this.loggedInProfile()
+    this.loggedInProfile();
   },
   methods: {
     loggedInProfile() {
-      if (window.sessionStorage.getItem('googleLoggedInToken')) {
+      if (window.sessionStorage.getItem("googleLoggedInToken")) {
         const result = jwtDecode(
-          window.sessionStorage.getItem('googleLoggedInToken')
-        )
-        this.imgURL = result.picture
-      } else if (window.sessionStorage.getItem('fbUserImg')) {
-        this.imgURL = window.sessionStorage.getItem('fbUserImg')
+          window.sessionStorage.getItem("googleLoggedInToken")
+        );
+        this.imgURL = result.picture;
+      } else if (window.sessionStorage.getItem("fbUserImg")) {
+        this.imgURL = window.sessionStorage.getItem("fbUserImg");
       }
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -97,8 +95,27 @@ export default {
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 100vw;
   #titleStyle {
-    color: blue;
-    margin-left: 6px;
+    padding-left: 20px;
+    h1 {
+      color: black;
+      font-size: 35px;
+      text-shadow: 0 0 5px red;
+      font-weight: bold;
+      &::after {
+        content: "Urban Renewal";
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        opacity: 0.2;
+      }
+      &::before {
+        content: "Urban Renewal";
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        opacity: 0.2;
+      }
+    }
   }
   #loginImg {
     margin: auto 8px;
@@ -109,6 +126,7 @@ export default {
     }
   }
   #notLoginButtonList {
+    z-index: 100;
     margin-right: 6px;
     .loginButton {
       margin: 6px 0;

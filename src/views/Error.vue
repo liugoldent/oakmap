@@ -1,28 +1,25 @@
 <template>
   <div id="errorContainer">
-    <p>Please Login</p>
+    <p></p>
   </div>
 </template>
 <script>
 export default {
-  data(){
-    return{
 
-    }
-  },
-  props: {
-
-  }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 #errorContainer{
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  height: 80vh;
+  p {
+    font-family: serif;
+    font-size: 64px;
+  }
 }
 </style>
 

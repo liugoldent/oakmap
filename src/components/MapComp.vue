@@ -151,8 +151,6 @@ export default {
      */
     circleInfor(e) {
       console.log(e.sourceTarget.options)
-      // const id = e.sourceTarget.options.name
-      // const result = this.detailList.find((data) => data.id === id)
     },
     /**
      * @description 從父組件打下來資料
