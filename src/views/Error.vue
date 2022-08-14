@@ -1,6 +1,6 @@
 <template>
   <div id="errorContainer">
-    <p>Error</p>
+    <p>Please Login</p>
   </div>
 </template>
 <script>
