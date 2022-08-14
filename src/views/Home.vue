@@ -73,8 +73,10 @@ export default {
     }
   },
   async mounted() {
+    this.$store.dispatch('loadingStart')
     this.allPlace = await this.getAllPlace()
     this.place = this.devideEachPlace(this.allPlace)
+    this.$store.dispatch('loadingEnd')
   },
   methods: {
     /**
@@ -132,8 +134,10 @@ export default {
      * @param {*} e
      */
     async clickPositionF(latlngObj) {
+      this.$store.dispatch('loadingStart')
       const { lat, lng } = latlngObj
       this.allDetailList = await this.getDetail(lat, lng)
+      this.$store.dispatch('loadingEnd')
     },
     /**
      * @description 把容積變成要給map的陣列
@@ -152,9 +156,11 @@ export default {
      * @param {Array} searchResult
      */
     async userClick(e) {
+      this.$store.dispatch('loadingStart')
       const { x: lng, y: lat } = e
       this.$refs.mapSelf.changePan({lng, lat})
       this.allDetailList = await this.getDetail(lat, lng)
+      this.$store.dispatch('loadingEnd')
     },
   },
 }

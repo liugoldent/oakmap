@@ -4,22 +4,30 @@
     <router-view v-if="loginValue" />
     <Error v-else />
     <div id="notLogin" v-if="!loginValue"></div>
+    <LoadingStatus v-if="loadingStatusCompu" />
   </div>
 </template>
 <script>
 import Header from "./components/Header.vue";
 import Error from "./views/Error.vue";
-
+import LoadingStatus from "./components/LoadingStatus.vue";
 export default {
   name: "App",
   components: {
     Header,
     Error,
+    LoadingStatus,
   },
   data() {
     return {
       loginValue: false,
+      loadingStatus: true,
     };
+  },
+  computed: {
+    loadingStatusCompu() {
+      return this.$store.state.loadingStatus;
+    },
   },
   methods: {
     /**

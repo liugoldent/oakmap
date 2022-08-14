@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import L from 'leaflet'
+import L from "leaflet";
 
 export default {
   data() {
@@ -16,8 +16,8 @@ export default {
       openStreetMap: {},
       nowMark: {},
       circleStatus: {},
-      imgURL: '',
-    }
+      imgURL: "",
+    };
   },
   props: {
     casePlace: Array,
@@ -26,20 +26,20 @@ export default {
   watch: {
     detailList(nval) {
       if (nval.length > 0) {
-        this.circleIt(nval)
+        this.circleIt(nval);
       }
     },
   },
   mounted() {
     // 初始化map
-    this.openStreetMap = L.map('mapid', {
+    this.openStreetMap = L.map("mapid", {
       zoom: 18,
-    })
-    this.titleIt()
-    this.openStreetMap.on('locationfound', this.foundHandler)
-    this.openStreetMap.on('click', this.getNewLatLng)
-    this.polygonIt()
-    this.initUserImg()
+    });
+    this.titleIt();
+    this.openStreetMap.on("locationfound", this.foundHandler);
+    this.openStreetMap.on("click", this.getNewLatLng);
+    this.polygonIt();
+    this.initUserImg();
   },
   methods: {
     /**
@@ -47,10 +47,10 @@ export default {
      */
     getNewLatLng(e) {
       if (e.latlng.lat && e.latlng.lng) {
-        const { lat, lng } = e.latlng
-        this.marketIt({ lat, lng })
-        this.mapPanTo({ lat, lng })
-        this.$emit('clickPositionS', { lat, lng })
+        const { lat, lng } = e.latlng;
+        this.marketIt({ lat, lng });
+        this.mapPanTo({ lat, lng });
+        this.$emit("clickPositionS", { lat, lng });
       }
     },
     /**
@@ -58,10 +58,12 @@ export default {
      * @param {*} e 座標位址
      */
     marketIt({ lat, lng }) {
-      if (this.nowMark) this.openStreetMap.removeLayer(this.nowMark)
+      if (this.nowMark) this.openStreetMap.removeLayer(this.nowMark);
       // const url = window.sessionStorage.getItem('fbUserImg')
-      this.nowMark = L.marker([lat, lng]).addTo(this.openStreetMap)
-      this.nowMark.bindPopup(`<img src=${this.imgURL} width = "48" height = "48"/>`).openPopup()
+      this.nowMark = L.marker([lat, lng]).addTo(this.openStreetMap);
+      this.nowMark
+        .bindPopup(`<img src=${this.imgURL} width = "48" height = "48"/>`)
+        .openPopup();
     },
     /**
      * @description 先上多邊形圖
@@ -69,23 +71,23 @@ export default {
     polygonIt() {
       try {
         const polygon = L.polygon(this.casePlace, {
-          color: '#308AFB',
+          color: "#308AFB",
           fillOpacity: 0.3,
           opacity: 0.5,
-        }).addTo(this.openStreetMap)
-        this.openStreetMap.fitBounds(polygon.getBounds())
+        }).addTo(this.openStreetMap);
+        this.openStreetMap.fitBounds(polygon.getBounds());
       } catch (e) {
-        console.error(e.message)
+        console.error(e.message);
       }
     },
     /**
      * @description 敘述版權
      */
     titleIt() {
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
-        attribution: '© OpenStreetMap',
-      }).addTo(this.openStreetMap)
+        attribution: "© OpenStreetMap",
+      }).addTo(this.openStreetMap);
     },
     /**
      * @description 取得使用者位置
@@ -97,7 +99,7 @@ export default {
         maxZoom: 18, // 最大的縮放值
         enableHighAccuracy: true, // 是否要高精準度的抓位置
         timeout: 10000, // 觸發locationerror事件之前等待的毫秒數
-      })
+      });
     },
     /**
      * @description foundHandler取得使用者位置 & 標記其座標 & 讓地圖回到使用者中心點
@@ -105,11 +107,11 @@ export default {
      */
     foundHandler(e) {
       try {
-        const { lat, lng } = e.latlng
-        this.marketIt({ lat, lng })
-        this.mapPanTo({ lat, lng })
+        const { lat, lng } = e.latlng;
+        this.marketIt({ lat, lng });
+        this.mapPanTo({ lat, lng });
       } catch (e) {
-        console.error(e.message)
+        console.error(e.message);
       }
     },
     /**
@@ -117,32 +119,32 @@ export default {
      * @param {*} e
      */
     mapPanTo({ lat, lng }) {
-      this.openStreetMap.panTo([lat, lng])
+      this.openStreetMap.panTo([lat, lng]);
     },
     /**
      * @description 取得使用者位置
      */
     locateUser() {
-      this.openStreetMap.locate({ setView: true })
+      this.openStreetMap.locate({ setView: true });
     },
     /**
      * @description 將都更範圍圈起來
      */
     circleIt(allDetailList) {
-      if (Object.keys(this.circleStatus).length > 0) return
+      if (Object.keys(this.circleStatus).length > 0) return;
       for (let i = 0, len = allDetailList.length; i < len; i++) {
-        const { latitude, longitude, radius, id } = allDetailList[i]
+        const { latitude, longitude, radius, id } = allDetailList[i];
         this.circleStatus = L.circle(
           { lat: latitude, lng: longitude },
           {
             radius,
-            color: 'red',
+            color: "red",
             opacity: 0.2,
             name: id,
           }
         )
           .addTo(this.openStreetMap)
-          .on('click', this.circleInfor)
+          .on("click", this.circleInfor);
       }
     },
     /**
@@ -150,27 +152,27 @@ export default {
      * @param {*} e
      */
     circleInfor(e) {
-      console.log(e.sourceTarget.options)
+      console.log(e.sourceTarget.options);
     },
     /**
      * @description 從父組件打下來資料
      */
     changePan({ lat, lng }) {
-      this.marketIt({ lat, lng })
-      this.mapPanTo({ lat, lng })
+      this.marketIt({ lat, lng });
+      this.mapPanTo({ lat, lng });
     },
     /**
      * @description 初始化使用者的大頭貼url
      */
     initUserImg() {
-      if (window.sessionStorage.getItem('fbUserImg')) {
-        this.imgURL = window.sessionStorage.getItem('fbUserImg')
-      } else if (window.sessionStorage.getItem('googleUserImg')) {
-        this.imgURL = window.sessionStorage.getItem('googleUserImg')
+      if (window.sessionStorage.getItem("fbUserImg")) {
+        this.imgURL = window.sessionStorage.getItem("fbUserImg");
+      } else if (window.sessionStorage.getItem("googleUserImg")) {
+        this.imgURL = window.sessionStorage.getItem("googleUserImg");
       }
     },
   },
-}
+};
 </script>
 
 
@@ -195,7 +197,7 @@ export default {
     z-index: 100;
     .buttonStyle {
       margin-right: 8px;
-      font-family: 'Open Sans', sans-serif;
+      font-family: "Open Sans", sans-serif;
       font-size: 16px;
       letter-spacing: 2px;
       text-decoration: none;
