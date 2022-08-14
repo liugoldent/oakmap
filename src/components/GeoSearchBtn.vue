@@ -23,37 +23,38 @@
 
 
 <script>
-import { OpenStreetMapProvider } from 'leaflet-geosearch'
+import { OpenStreetMapProvider } from "leaflet-geosearch";
 
 export default {
   data() {
     return {
-      userInput: '',
+      userInput: "",
       searchResult: [],
-    }
+    };
   },
   methods: {
     /**
      * @description 搜尋輸入的地點
      */
     async searchGeo() {
-      const provider = new OpenStreetMapProvider()
-      const results = await provider.search({ query: this.userInput })
-      this.searchResult = results.slice(0, 5)
+      const provider = new OpenStreetMapProvider();
+      const results = await provider.search({ query: this.userInput });
+      this.searchResult = results.slice(0, 5);
     },
     /**
      * @description 使用者點選他想要的資料之後，送出去父組件
      */
     getUserWant(e) {
-      this.$emit('userClick', e)
-      this.searchResult = []
+      this.$emit("userClick", e);
+      this.searchResult = [];
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
 #searchBtnContainer {
+  width: 80vw;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -76,7 +77,7 @@ export default {
   #searchResultStyle {
     position: absolute;
     bottom: 50px;
-    width: 400px;
+    width: 350px;
     height: auto;
     li {
       background-color: #e09fb9;
