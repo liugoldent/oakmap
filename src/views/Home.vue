@@ -127,7 +127,7 @@ export default {
         .then((response) => {
           return response.data.result
         })
-        .catch((e) => console.log('getDetail 失敗', e))
+        .catch((e) => alert(e))
     },
     /**
      * @description 用點到的位置去打api，看距離多少
